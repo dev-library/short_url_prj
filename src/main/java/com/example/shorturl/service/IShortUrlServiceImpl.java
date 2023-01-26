@@ -20,7 +20,7 @@ public class IShortUrlServiceImpl implements IShortUrlService {
     static int lastSavedIndex = -1;
 
     @Override
-    String getEncodeBase62(int index) {
+    public String getEncodeBase62(int index) {
         String result = "";
 
         while(index % 62 > 0 || result == "") {
@@ -48,7 +48,7 @@ public class IShortUrlServiceImpl implements IShortUrlService {
     }
 
     @Override
-    String getDecodeBase62(String shortUrl) {
+    public int getDecodeBase62(String shortUrl) {
         // 디코드 로직
         int num = 0;
         int pow = 1;// 62의 승수
@@ -58,15 +58,14 @@ public class IShortUrlServiceImpl implements IShortUrlService {
             num += BASE62CHARLIST.indexOf(shortUrl.charAt(i)) * pow;
             pow *= BASE62CHARLIST.length();
         }
-        return "" + num;
+        return num;
     }
 
     @Override
     public String getLongUrl(String shortUrl) {
+        int longUrlIndex = getDecodeBase62(shortUrl);
 
-
-
-        return null;
+        return shortUrlRepository.getLongUrl(longUrlIndex);
     }
 
 

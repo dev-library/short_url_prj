@@ -2,8 +2,15 @@ package com.example.shorturl.controller;
 
 import com.example.shorturl.service.IShortUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 
 @Controller
 public class ShortUrlController {
@@ -20,18 +27,11 @@ public class ShortUrlController {
         return "main";
     }
 
-    // 추후 짧은 URL 처리용으로 일단 대기
-    @ResponseBody
+    // 이동은 잘 되나 https:// 가 안 붙는거 처리가 추가로 들어가야함
     @GetMapping("/{shortUrl}")
     public String sendRedirectLongUrl(@PathVariable String shortUrl){
-        // 먼저 해당 shortUrl을 숫자로 디코딩
-        //int index = shortUrlservice.getDecodeBase62(shortUrl);
 
-        // 디코딩한 url을 인덱스를 이용해 뽑아오기
-        // 주의할점은 서비스를 통해서 요청...?
-        //String longUrl = shortUrlservice.getLongUrl(index);
-
-        return "redirect:/" + "originalUrl";
+        return "redirect:https://" + shortUrlservice.getLongUrl(shortUrl);
     }
 
     @ResponseBody
@@ -44,7 +44,5 @@ public class ShortUrlController {
         // shortUrl을 받아서 화면에 띄워주고 마무리
         return "shortUrl 결과 : " + shortUrl;
     }
-
-
 
 }

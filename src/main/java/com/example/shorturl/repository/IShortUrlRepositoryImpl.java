@@ -16,4 +16,9 @@ public class IShortUrlRepositoryImpl implements IShortUrlRepository{
         // 추후 입력 실패시엔 false도 리턴하도록 개선 필요.
         return true;
     }
+
+    @Override
+    public String getLongUrl(int longUrlIndex) {
+        return urlMappingList.get(longUrlIndex);
+    }
 }
