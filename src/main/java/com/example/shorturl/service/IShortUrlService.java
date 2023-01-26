@@ -2,7 +2,7 @@ package com.example.shorturl.service;
 
 public interface IShortUrlService {
 
-    String[] BASE62 = {
+    String[] BASE62CHARLIST = {
             "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
             "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
             "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
@@ -12,6 +12,6 @@ public interface IShortUrlService {
             "y", "z"};
 
 
-    public String getBase62();
+    public String getBase62(int index);
     public String getShortUrl();
 }
