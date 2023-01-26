@@ -7,8 +7,13 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class ShortUrlController {
-    @Autowired
+
     IShortUrlService shortUrlservice;
+
+    @Autowired
+    ShortUrlController(IShortUrlService shortUrlService){
+        this.shortUrlservice = shortUrlService;
+    }
 
     @GetMapping("/main")
     public String goMainPage(){
@@ -20,11 +25,13 @@ public class ShortUrlController {
     @GetMapping("/{shortUrl}")
     public String sendRedirectLongUrl(@PathVariable String shortUrl){
         // 먼저 해당 shortUrl을 숫자로 디코딩
+        //int index = shortUrlservice.getDecodeBase62(shortUrl);
 
         // 디코딩한 url을 인덱스를 이용해 뽑아오기
         // 주의할점은 서비스를 통해서 요청...?
+        //String longUrl = shortUrlservice.getLongUrl(index);
 
-        return "redirect:/" + "longUrl";
+        return "redirect:/" + "originalUrl";
     }
 
     @ResponseBody
