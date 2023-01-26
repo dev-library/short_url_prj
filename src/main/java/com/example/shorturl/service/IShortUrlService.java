@@ -13,5 +13,5 @@ public interface IShortUrlService {
 
 
     public String getBase62(int index);
-    public String getShortUrl();
+    public String getShortUrl(String longUrl);
 }
