@@ -13,7 +13,9 @@ public class ShortUrlRepositoryTests {
     IShortUrlRepository shortUrlRepository;
 
     @Test
-    public void test(){
+    public void testCheckDuplication(){
+        log.info("" + shortUrlRepository.checkDuplication("jrkljgklrjk"));
 
     }
+
 }

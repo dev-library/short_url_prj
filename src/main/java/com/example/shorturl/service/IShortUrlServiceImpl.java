@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class IShortUrlServiceImpl implements IShortUrlService {
@@ -16,8 +18,8 @@ public class IShortUrlServiceImpl implements IShortUrlService {
         this.shortUrlRepository = shortUrlRepository;
     }
 
-    // 저장할번호 -1을 항상 가지는 변수. 저장할때마다 +1을 한다.
-    static int lastSavedIndex = -1;
+    // 저장할번호 0을 가지는 변수. 저장할때마다 +1을 한다.
+    static int lastSavedIndex = 0;
 
     @Override
     public String getEncodeBase62(int index) {
@@ -33,18 +35,28 @@ public class IShortUrlServiceImpl implements IShortUrlService {
     @Override
     public String getShortUrl(String longUrl) {
         String shortUrl = "";
-        // 먼저 DB에 처 집어넣기 위해 라스트 인덱스 번호를 +1
-        // 테스트할때는 몇백단위로 증가하게 해서 변하는거 확인함.
-        // 이거 처음에 int였는데 long으로 하는게 좋을듯
-        // long으로 하니까 인덱싱이 안됨 일단 int 유지
-        lastSavedIndex += 1;
-        // 그 다음 해당 DB에 처집어넣기.
-        boolean isInsertOk =  shortUrlRepository.insertUrl(longUrl);
 
-        // 집어넣은 url을 인코딩해서 저장받기
-        shortUrl = getEncodeBase62(lastSavedIndex);
+        longUrl = checkPrefix(longUrl);
+        // checkup부터 해서 검사
+        int checkedIndex = shortUrlRepository.checkDuplication(longUrl);
+        if(checkedIndex == -1){
+            // 중복이 아닌 경우
+            // 먼저 DB에 처 집어넣기 위해 라스트 인덱스 번호를 +1
+            // 테스트할때는 몇백단위로 증가하게 해서 변하는거 확인함.
+            // 이거 처음에 int였는데 long으로 하는게 좋을듯
+            // long으로 하니까 인덱싱이 안됨 일단 int 유지
+            lastSavedIndex += 1;
 
+            // 그 다음 해당 DB에 처집어넣기.
+            shortUrlRepository.insertUrl(longUrl);
+            // 집어넣은 url을 인코딩해서 저장받기
+            shortUrl = getEncodeBase62(lastSavedIndex);
+        }else {
+            // 중복인 경우
+            shortUrl = getEncodeBase62(checkedIndex + 1);
+        }
         return shortUrl;
+
     }
 
     @Override
@@ -64,8 +76,26 @@ public class IShortUrlServiceImpl implements IShortUrlService {
     @Override
     public String getLongUrl(String shortUrl) {
         int longUrlIndex = getDecodeBase62(shortUrl);
+        // 0번 인덱스 자료는 이상하게 리다이렉트가 안됨. 사용자에겐 0이 아닌 1부터 주지만, 실제로는 -1해서 논리적으로는 입력순서에 맞게 0부터 조회하도록
+        return shortUrlRepository.getLongUrl(longUrlIndex-1);
+    }
 
-        return shortUrlRepository.getLongUrl(longUrlIndex);
+    @Override
+    public String checkPrefix(String longUrl) {
+        Pattern pattern = Pattern.compile("http" + ".*");
+        Matcher matcher = pattern.matcher(longUrl);
+        if(!matcher.find()){
+            longUrl = "http://" + longUrl;
+        }
+        return longUrl;
+    }
+
+    @Override
+    public boolean checkPattern(String longUrl) {
+        Pattern pattern = Pattern.compile(".*\\..*");
+        Matcher matcher = pattern.matcher(longUrl);
+
+        return matcher.find();
     }
 
 

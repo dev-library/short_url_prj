@@ -22,7 +22,7 @@ public class ShortUrlController {
         this.shortUrlservice = shortUrlService;
     }
 
-    @GetMapping("/main")
+    @GetMapping("/")
     public String goMainPage(){
         return "main";
     }
@@ -31,18 +31,23 @@ public class ShortUrlController {
     @GetMapping("/{shortUrl}")
     public String sendRedirectLongUrl(@PathVariable String shortUrl){
 
-        return "redirect:https://" + shortUrlservice.getLongUrl(shortUrl);
+        // 최초에 집어넣는 url만 지멋대로 localhost:8181/www.naver.com으로 연결되는 이슈 발견함 해결 감도안옴
+        return "redirect:" + shortUrlservice.getLongUrl(shortUrl);
     }
 
     @ResponseBody
-    @PostMapping("/encode")
+    @PostMapping("/")
     public String getShortUrl(String longUrl){
-        // 긴 url을 받았다면 서비스에 저장로직을 호출
-        String shortUrl = shortUrlservice.getShortUrl(longUrl);
+        if(shortUrlservice.checkPattern(longUrl)){
+            // 긴 url을 받았다면 서비스에 저장로직을 호출
+            String shortUrl = shortUrlservice.getShortUrl(longUrl);
 
-        // 저장 완료되었음을 알려주는 페이지로 이동
-        // shortUrl을 받아서 화면에 띄워주고 마무리
-        return "shortUrl 결과 : " + shortUrl;
+            // 저장 완료되었음을 알려주는 페이지로 이동
+            // shortUrl을 받아서 화면에 띄워주고 마무리
+            return "shortUrl 결과 : " + shortUrl;
+        }else {
+            return "URL형식에 맞는 정보를 입력해주세요.";
+        }
     }
 
 }
